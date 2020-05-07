@@ -5,13 +5,8 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
-import android.util.Log;
-
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import local.hapra.pongxxjava.kernel.OrientationAbstract;
-import local.hapra.pongxxjava.kernel.Speed;
-
 
 /**
  * Zugriff auf den Beschleunigunssensor
@@ -23,11 +18,12 @@ public class Orientation extends OrientationAbstract {
 
     private class MySensorEventListener implements SensorEventListener {
 
-        private int getDirection(float acceleration) {
-            return Float.compare(acceleration, 0.0f);
+        private int getDirection(float value) {
+            return Float.compare(0.0f, value);
         }
-        private float getAcceleration(float acceleration) {
-            return Math.abs(acceleration);
+
+        private float getAcceleration(float value) {
+            return Math.abs(value);
         }
 
         @Override
@@ -42,21 +38,19 @@ public class Orientation extends OrientationAbstract {
                 return;
             }
 
-            // handle
-            float[] values = event.values;
+            float x = event.values[0];
+            float y = event.values[1];
 
-            Orientation.this.xAcceleration = getAcceleration(values[0]);
-            Orientation.this.yAcceleration = getAcceleration(values[1]);
-            Orientation.this.xDirection = getDirection(values[0]);
-            Orientation.this.yDirection = getDirection(values[1]);
+            Orientation.this.xAcceleration = getAcceleration(x);
+            Orientation.this.yAcceleration = getAcceleration(y);
+            Orientation.this.xDirection = getDirection(x);
+            Orientation.this.yDirection = getDirection(y);
         }
 
         @Override
-        public void onAccuracyChanged(Sensor sensor, int accuracy) {
+        public void onAccuracyChanged(Sensor ignore0, int ignore1) {
         }
     }
-
-    private Context context;
 
     private final Object LOCK = new Object();
     private boolean listenerRegistered;
@@ -73,7 +67,6 @@ public class Orientation extends OrientationAbstract {
     public Orientation(Context context) {
 
         super(context);
-        this.context = context;
         this.listenerRegistered = false;
         this.sensorEventListener = new MySensorEventListener();
 
@@ -82,7 +75,7 @@ public class Orientation extends OrientationAbstract {
         this.xDirection = 0;
         this.yDirection = 0;
 
-        sensorManager = (SensorManager) this.context.getSystemService(Context.SENSOR_SERVICE);
+        sensorManager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
         assert sensorManager != null;
 
         sensor = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
