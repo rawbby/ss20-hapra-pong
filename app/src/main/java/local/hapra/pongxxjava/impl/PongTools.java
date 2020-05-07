@@ -1,7 +1,6 @@
 package local.hapra.pongxxjava.impl;
 
 import android.content.Context;
-import android.os.Build;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
 import android.util.Log;
